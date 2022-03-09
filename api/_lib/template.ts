@@ -122,6 +122,11 @@ function getCss(theme: string, isChangePositive: boolean) {
         color: ${theme === "dark" ? "#777B92" : "#8C90B0"};
     }
 
+    .main .time {
+        color: ${theme === "dark" ? "#777B92" : "#8C90B0"};
+        font-size: 14px;
+    }
+
     .main .details {
         margin-top: 44px;
         display: flex;
@@ -181,19 +186,19 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export function getHtml(parsedReq: ParsedRequest) {
-    const { cardName, valueHeader, tvl, volumeChange, footerURL, theme, md, images } = parsedReq;
+    const { cardName, valueHeader, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
 
-    const isChangePositive = volumeChange?.includes("+") ?? false;
-    const isChangeNegative = volumeChange?.includes("-") ?? false;
+    const isChangePositive = pnlChange?.includes("+") ?? false;
+    const isChangeNegative = pnlChange?.includes("-") ?? false;
 
     let trend: string;
 
     if (isChangePositive) {
-        trend = volumeChange.split("+")[1]
+        trend = pnlChange.split("+")[1]
     } else if (isChangeNegative) {
-        trend = volumeChange.split("-")[1]
+        trend = pnlChange.split("-")[1]
     } else {
-        trend = volumeChange || '';
+        trend = pnlChange || '';
     }
 
     return `<!DOCTYPE html>
@@ -205,7 +210,7 @@ export function getHtml(parsedReq: ParsedRequest) {
                     ${getCss(theme, isChangePositive)}
                 </style>
                 <body>
-                    ${renderContent({cardName, images, valueHeader, md, tvl, isChangePositive, isChangeNegative, trend})}
+                    ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, trend})}
                     <div class="footer">
                         A permissionless lending and margin trading protocol, enabling traders to go long or short with any pairs on DEXs efficiently and securely.Learn more on :
                         ${emojify(
@@ -226,49 +231,54 @@ function getImage(src: string, height = '80', className = 'logo') {
     />`
 }
 
-function renderContent({cardName, images, valueHeader, md, tvl, isChangePositive, isChangeNegative, trend}: IRenderContent) {
+function renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, trend}: IRenderContent) {
     if (!cardName || cardName === "default") {
         return renderOnlyLogo(images[0])
-    } else if (!valueHeader || !tvl) {
+    } else if (!valueHeader || !pairName) {
         return renderWithoutPrice({images, cardName, md})
     } else {
-        return renderWithPrice({images, cardName, tvl, valueHeader, isChangePositive, isChangeNegative, md, trend})
+        return renderWithPrice({images, cardName, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md, trend})
     }
 }
 
 
 function renderOnlyLogo(image: string) {
     return `<div class="center">
-                ${getImage(image, "120", "logo")}
+                ${getImage(image, "120", "tokenLogo")}
             </div>`
 }
 
 function renderWithoutPrice({images, cardName, md}: IRenderWithoutPrice) {
     return `<div class="header center">
                 <div class="details">
-                    ${getImage(images[1], '100', "tokenLogo")}
+                    ${getImage(images[0], '100', "tokenLogo")}
                     <div class="name font-40px">${emojify(
                         md ? marked(cardName) : sanitizeHtml(cardName)
                     )}</div>
                 </div>
-                ${getImage(images[0], '100', "logo")}
             </div>`
 }
 
-function renderWithPrice({images, cardName, tvl, valueHeader, isChangePositive, isChangeNegative, md, trend}: IRenderWithPrice) {
+function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithPrice) {
     return `<div class="header">
                 <div class="details">
-                    ${getImage(images[1], '80', "tokenLogo")}
+                    ${getImage(images[0], '100', "tokenLogo")}
                     <div class="name">${emojify(
                         md ? marked(cardName) : sanitizeHtml(cardName)
                     )}</div>
                 </div>
-                ${getImage(images[0], '80', "logo")}
+                
             </div>
             <div class="main">
                 <div class="title">${sanitizeHtml(valueHeader)}</div>
+                <div class="time">${sanitizeHtml(dateTime)}</div>
+                <div class="time">${sanitizeHtml(referralCode)}</div>
                 <div class="details">
-                    <div class="value">${sanitizeHtml(tvl)}</div>
+                    <div class="value">${sanitizeHtml(pairName)}</div>
+                    <div class="value">${sanitizeHtml(openPrice)}</div>
+                    <div class="value">${sanitizeHtml(curPrice)}</div>
+                    <div class="value">${sanitizeHtml(side)}</div>
+                    
                     <div class="change">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=${isChangePositive ? `"M7 11l5-5m0 0l5 5m-5-5v12"` : isChangeNegative ? `"M17 13l-5 5m0 0l-5-5m5 5V6"` : ''} />

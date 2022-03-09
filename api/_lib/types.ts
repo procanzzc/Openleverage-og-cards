@@ -5,8 +5,13 @@ export interface ParsedRequest {
     fileType: FileType;
     cardName: string;
     valueHeader: string;
-    tvl: string;
-    volumeChange: string;
+    pairName: string;
+    curPrice: string;
+    openPrice: string;
+    dateTime: string;
+    referralCode: string;
+    side: string;
+    pnlChange: string;
     footerURL: string;
     theme: Theme;
     md: boolean;
@@ -17,7 +22,12 @@ export interface IRenderContent {
     images: string[]
     valueHeader: string
     md: boolean
-    tvl: string
+    pairName: string
+    curPrice: string
+    openPrice: string
+    dateTime: string
+    referralCode: string
+    side: string
     trend: string
     isChangePositive: boolean
     isChangeNegative: boolean
@@ -26,7 +36,12 @@ export interface IRenderContent {
 export interface IRenderWithPrice {
     images: string[] 
     cardName: string
-    tvl: string
+    pairName: string
+    curPrice: string
+    openPrice: string
+    dateTime: string
+    referralCode: string
+    side: string
     valueHeader: string
     isChangePositive: boolean
     isChangeNegative: boolean

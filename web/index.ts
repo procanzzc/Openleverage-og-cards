@@ -174,10 +174,15 @@ const App = (_: any, state: AppState, setState: SetState) => {
         md = false,
         cardName = 'Openleverage',
         valueHeader = 'Pnl',
-        tvl = '1BNB',
-        volumeChange = "-2%",
+        pairName = 'BNB-BUSD',
+        curPrice = '888',
+        openPrice = '333',
+        side = '2X Long',
+        pnlChange = "-2%",
+        dateTime = 'Mar 15, 22 20:00',
+        referralCode = 'Um13231',
         footerURL = "https://openleverage.finance",
-        images=[imageLightOptions[0].value, protocolImage],
+        images=[protocolImage],
         showToast = false,
         messageToast = '',
         loading = true,
@@ -192,8 +197,13 @@ const App = (_: any, state: AppState, setState: SetState) => {
     theme && url.searchParams.append('theme', theme);
     mdValue && url.searchParams.append('md', mdValue);
     valueHeader && url.searchParams.append('valueHeader', valueHeader);
-    tvl && url.searchParams.append('tvl', tvl);
-    volumeChange && url.searchParams.append('volumeChange', volumeChange);
+    pairName && url.searchParams.append('pairName', pairName);
+    curPrice && url.searchParams.append('curPrice', curPrice);
+    openPrice && url.searchParams.append('openPrice', openPrice);
+    dateTime && url.searchParams.append('dateTime', dateTime);
+    referralCode && url.searchParams.append('referralCode', referralCode);
+    side && url.searchParams.append('side', side);
+    pnlChange && url.searchParams.append('pnlChange', pnlChange);
     footerURL && url.searchParams.append("footerURL", encodeURIComponent(footerURL));
 
     for (let image of images) {
@@ -280,20 +290,65 @@ const App = (_: any, state: AppState, setState: SetState) => {
                     })
                 }),
                 H(Field, {
-                    label: 'TVL',
+                    label: 'Pair Name',
                     input: H(TextInput, {
-                        value: tvl,
+                        value: pairName,
                         oninput: (val: string) => {
-                            setLoadingState({ tvl: val, overrideUrl: url });
+                            setLoadingState({ pairName: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'Current Price',
+                    input: H(TextInput, {
+                        value: curPrice,
+                        oninput: (val: string) => {
+                            setLoadingState({ curPrice: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'Open Price',
+                    input: H(TextInput, {
+                        value: openPrice,
+                        oninput: (val: string) => {
+                            setLoadingState({ openPrice: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'side',
+                    input: H(TextInput, {
+                        value: side,
+                        oninput: (val: string) => {
+                            setLoadingState({ side: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'time',
+                    input: H(TextInput, {
+                        value: dateTime,
+                        oninput: (val: string) => {
+                            setLoadingState({ dateTime: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'Referral code',
+                    input: H(TextInput, {
+                        value: referralCode,
+                        oninput: (val: string) => {
+                            setLoadingState({ referralCode: val, overrideUrl: url });
                         }
                     })
                 }),
                 H(Field, {
                     label: 'Percent Change',
                     input: H(TextInput, {
-                        value: volumeChange,
+                        value: pnlChange,
                         oninput: (val: string) => {
-                            setLoadingState({ volumeChange: val, overrideUrl: url });
+                            setLoadingState({ pnlChange: val, overrideUrl: url });
                         }
                     })
                 }),

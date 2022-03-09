@@ -5,7 +5,7 @@ import { ParsedRequest, Theme } from './types';
 export function parseRequest(req: IncomingMessage) {
     console.log('HTTP ' + req.url);
     const { pathname, query } = parse(req.url || '/', true);
-    const { footerURL, images, theme, md, valueHeader, tvl, volumeChange } = (query || {});
+    const { footerURL, images, theme, md, valueHeader, pairName, pnlChange, curPrice, openPrice,side, dateTime, referralCode } = (query || {});
 
     if (Array.isArray(theme)) {
         throw new Error('Expected a single theme');
@@ -29,8 +29,13 @@ export function parseRequest(req: IncomingMessage) {
         fileType: extension === 'jpeg' ? extension : 'png',
         cardName: decodeURIComponent(cardName),
         valueHeader: getString(valueHeader),
-        tvl: getString(tvl),
-        volumeChange: getString(volumeChange),
+        pairName: getString(pairName),
+        curPrice: getString(curPrice),
+        openPrice: getString(openPrice),
+        side: getString(side),
+        pnlChange: getString(pnlChange),
+        dateTime: getString(dateTime),
+        referralCode: getString(referralCode),
         footerURL: decodeURIComponent(url),
         theme: theme === 'dark' ? 'dark' : 'light',
         md: md === '1' || md === 'true',
