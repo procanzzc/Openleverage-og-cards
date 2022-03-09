@@ -6,11 +6,12 @@ import { ParsedRequest, IRenderContent, IRenderWithPrice, IRenderWithoutPrice } 
 const twemoji = require('twemoji');
 const twOptions = { folder: 'svg', ext: '.svg' };
 const emojify = (text: string) => twemoji.parse(text, twOptions);
+const QRCode = require('qrcode');
 
 const rglr = readFileSync(`${__dirname}/../_fonts/Inter-Regular.woff2`).toString('base64');
 const bold = readFileSync(`${__dirname}/../_fonts/Inter-Bold.woff2`).toString('base64');
 const mono = readFileSync(`${__dirname}/../_fonts/Vera-Mono.woff2`).toString('base64');
-
+let dataUrl = '';
 function getCss(theme: string, isChangePositive: boolean) {
     let background = 'white';
     let foreground = 'black';
@@ -185,12 +186,13 @@ function getCss(theme: string, isChangePositive: boolean) {
     }`;
 }
 
-export function getHtml(parsedReq: ParsedRequest) {
+export async function getHtml(parsedReq: ParsedRequest) {
     const { cardName, valueHeader, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
 
     const isChangePositive = pnlChange?.includes("+") ?? false;
     const isChangeNegative = pnlChange?.includes("-") ?? false;
 
+    dataUrl = await QRCode.toDataURL('http://www.google.com');
     let trend: string;
 
     if (isChangePositive) {
@@ -260,6 +262,7 @@ function renderWithoutPrice({images, cardName, md}: IRenderWithoutPrice) {
 }
 
 function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithPrice) {
+    console.log(referralCode)
     return `<div class="header">
                 <div class="details">
                     ${getImage(images[0], '100', "tokenLogo")}
@@ -272,7 +275,6 @@ function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, ope
             <div class="main">
                 <div class="title">${sanitizeHtml(valueHeader)}</div>
                 <div class="time">${sanitizeHtml(dateTime)}</div>
-                <div class="time">${sanitizeHtml(referralCode)}</div>
                 <div class="details">
                     <div class="value">${sanitizeHtml(pairName)}</div>
                     <div class="value">${sanitizeHtml(openPrice)}</div>
@@ -286,5 +288,6 @@ function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, ope
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
-            </div>`
+            </div>
+            <div><img src=${dataUrl} /></div>`
 }
