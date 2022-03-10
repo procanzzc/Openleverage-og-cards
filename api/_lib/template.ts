@@ -13,8 +13,8 @@ const bold = readFileSync(`${__dirname}/../_fonts/Inter-Bold.woff2`).toString('b
 const mono = readFileSync(`${__dirname}/../_fonts/Vera-Mono.woff2`).toString('base64');
 let dataUrl = '';
 function getCss(theme: string, isChangePositive: boolean) {
-    let background = 'white';
-    let foreground = 'black';
+    let background = 'linear-gradient(180deg, #05051E 0%, #000D7E 100%)';
+    let foreground = 'rgba(255, 255, 255, 0.8)';
 
     if (theme === 'dark') {
         background = '#262938';
@@ -55,7 +55,7 @@ function getCss(theme: string, isChangePositive: boolean) {
         display: flex;
         flex-direction: column;
         height: 100vh;
-        padding: 48px;
+        padding: 40px;
         background: ${background};
         font-family: 'Inter', sans-serif;
         font-style: normal;
@@ -75,7 +75,6 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .header {
         display: flex;
-        justify-content: space-between;
         align-items: center;
     }
 
@@ -87,64 +86,113 @@ function getCss(theme: string, isChangePositive: boolean) {
         overflow: hidden;
     }
 
-    .header .details .name {
+    .header .name {
         font-weight: 600;
-        font-size: 48px;
+        font-size: 20px;
         white-space: nowrap;
         overflow: hidden;
+        color: ${foreground};
         text-overflow: ellipsis;
     }
 
-    .logo {
-        margin-left: "100px";
+    .desc {
+        font-size: 12px;
+        font-weight: normal;
+        margin-top: 10px;
+        color: rgba(255, 255, 255, 0.5);
     }
 
     .tokenLogo {
-        margin-right: 32px;
+        margin-right: 12px;
         border-radius: 50%;
     }
 
     .main {
-        padding: 40px;
-        padding-bottom: 32px;
-        background: ${theme === "dark" ? "#1C1F2E" : "rgba(230, 232, 248, 0.6)"};
-        margin: auto 0;
-        width: fit-content;
-        min-width: 70%;
-        border-radius: 40px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        padding: 0px;
+        margin-top: 45px;
     }
 
     .main .title {
         font-weight: 500;
-        font-size: 32px;
-        color: ${theme === "dark" ? "#777B92" : "#8C90B0"};
+        font-size: 20px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.5);
     }
 
-    .main .time {
-        color: ${theme === "dark" ? "#777B92" : "#8C90B0"};
-        font-size: 14px;
+    .pair-info .info {
+        margin-top: 36px;
+        margin-bottom: 8px;
     }
 
-    .main .details {
-        margin-top: 44px;
-        display: flex;
-        align-items: baseline;
+    .pair-info .line {
+        color:  rgba(255, 255, 255, 0.3);
+        margin: 0 6px;
+        transform: translateY(-5px);
     }
 
-    .main .details .value{
-        font-weight: 600;
-        font-size: 104px;
-        color: ${theme === "dark" ? "#FFFFFF" : "#213295"};
-        margin-right: 40px;
+    .info .pair-name {
+        font-weight: bold;
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.8);
     }
+
+    .info .pair-side {
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+    .pair-info .time {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 12px;
+    }
+
 
     .main .details .change {
-        font-weight: 600;
-        font-size: 44px;
-        color: ${isChangePositive ? "#4BA433" : "#FF3F28"};
+        font-weight: 800;
+        font-size: 45px;
+        color: ${isChangePositive ? "#21E070" : "#FF1D7C"};
+        line-height: 45px;
+    }
+
+
+    .price {
+        display: flex;
+        margin-top: 14px;
+    }
+
+    .price .value{
+        min-width: 120px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 12px;
+    }
+
+    .price .value p {
+        color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 8px;
+        font-size: 12px;
+    }
+    .referral {
+        margin-top: 5px;
+    }
+
+    .code-img{
+        width: 70px;
+        height: 70px;
+        opacity: 0;
+    }
+
+    .code-num p{
+        font-size: 12px;
+        margin-bottom: 5px;
+        font-weight: normal;
+        color: rgba(255, 255, 255, 0.5);
+    }
+
+    .code-num span{
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 24px;
     }
 
     .change svg {
@@ -170,13 +218,6 @@ function getCss(theme: string, isChangePositive: boolean) {
         font-size: 40px !important;
     }
     
-    .footer {
-        font-style: italic;
-        font-weight: normal;
-        font-size: 24px;
-        color: ${theme === "dark" ? "rgba(149, 153, 171, 0.9)" : "#575A68"};
-        margin-bottom: -16px;
-    }
 
     .emoji {
         height: 1em;
@@ -188,11 +229,15 @@ function getCss(theme: string, isChangePositive: boolean) {
 
 export async function getHtml(parsedReq: ParsedRequest) {
     const { cardName, valueHeader, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
+    console.log(footerURL,'footerURL')
 
     const isChangePositive = pnlChange?.includes("+") ?? false;
     const isChangeNegative = pnlChange?.includes("-") ?? false;
 
-    dataUrl = await QRCode.toDataURL('http://www.google.com');
+    dataUrl = await QRCode.toDataURL('http://www.google.com',{
+        margin: 1,
+        width: 70
+    });
     let trend: string;
 
     if (isChangePositive) {
@@ -213,12 +258,6 @@ export async function getHtml(parsedReq: ParsedRequest) {
                 </style>
                 <body>
                     ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, trend})}
-                    <div class="footer">
-                        A permissionless lending and margin trading protocol, enabling traders to go long or short with any pairs on DEXs efficiently and securely.Learn more on :
-                        ${emojify(
-                            md ? marked(footerURL) : sanitizeHtml(footerURL || "https://openleverage.finance")
-                        )}
-                    </div>
                 </body>
             </html>`;
     }
@@ -262,32 +301,47 @@ function renderWithoutPrice({images, cardName, md}: IRenderWithoutPrice) {
 }
 
 function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithPrice) {
-    console.log(referralCode)
     return `<div class="header">
-                <div class="details">
-                    ${getImage(images[0], '100', "tokenLogo")}
+                    ${getImage(images[0], '30', "tokenLogo")}
                     <div class="name">${emojify(
                         md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>
-                </div>
-                
+                    )}</div>                  
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            <div class="pair-info">
+                <div class="info">
+                    <span class="pair-name">${sanitizeHtml(pairName)}</span>
+                    <span class="line">|</span>
+                    <span class="pair-side" style="${side.indexOf('Long')!==-1?'color:#21E070':'color:#FF1D7C'}">${sanitizeHtml(side)}</span>
+                </div>        
+                <div class="time">${sanitizeHtml(dateTime)}</div>
             </div>
             <div class="main">
                 <div class="title">${sanitizeHtml(valueHeader)}</div>
-                <div class="time">${sanitizeHtml(dateTime)}</div>
+                
                 <div class="details">
-                    <div class="value">${sanitizeHtml(pairName)}</div>
-                    <div class="value">${sanitizeHtml(openPrice)}</div>
-                    <div class="value">${sanitizeHtml(curPrice)}</div>
-                    <div class="value">${sanitizeHtml(side)}</div>
-                    
                     <div class="change">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=${isChangePositive ? `"M7 11l5-5m0 0l5 5m-5-5v12"` : isChangeNegative ? `"M17 13l-5 5m0 0l-5-5m5 5V6"` : ''} />
-                        </svg>
+                        ${isChangePositive?'+':''}
+                        ${isChangeNegative?'-':''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
             </div>
-            <div><img src=${dataUrl} /></div>`
+            <div class="price">
+                <div class="value">
+                    <p>Open Price</p>    
+                    ${sanitizeHtml(openPrice)}
+                </div>
+                <div class="value">
+                    <p>Current Price</p>   
+                    ${sanitizeHtml(curPrice)}
+                </div>
+            </div>
+            <div class="referral">
+                <div class="code-img"><img src=${dataUrl} /></div>
+                <div class="code-num">
+                        <p>Refferral Code</p>
+                        <span>${referralCode}</span>
+                </div>
+            </div>`
 }
