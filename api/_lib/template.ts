@@ -2,7 +2,7 @@
 import { readFileSync } from 'fs';
 import {marked} from 'marked';
 import { sanitizeHtml } from './sanitizer';
-import { ParsedRequest, IRenderContent, IRenderWithPrice, IRenderWithoutPrice } from './types';
+import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative } from './types';
 const twemoji = require('twemoji');
 const twOptions = { folder: 'svg', ext: '.svg' };
 const emojify = (text: string) => twemoji.parse(text, twOptions);
@@ -117,6 +117,7 @@ function getCss(theme: string, isChangePositive: boolean) {
         font-size: 20px;
         font-weight: 500;
         color: rgba(255, 255, 255, 0.5);
+        margin-bottom: 10px;
     }
 
     .pair-info .info {
@@ -204,10 +205,11 @@ function getCss(theme: string, isChangePositive: boolean) {
     }
 
     .center {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        top: 0;
     }
 
     .header.center {
@@ -228,7 +230,7 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export async function getHtml(parsedReq: ParsedRequest) {
-    const { cardName, valueHeader, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
+    const { cardName, valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
     console.log(footerURL,'footerURL')
 
     const isChangePositive = pnlChange?.includes("+") ?? false;
@@ -257,7 +259,7 @@ export async function getHtml(parsedReq: ParsedRequest) {
                     ${getCss(theme, isChangePositive)}
                 </style>
                 <body>
-                    ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, trend})}
+                    ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend})}
                 </body>
             </html>`;
     }
@@ -272,35 +274,60 @@ function getImage(src: string, height = '80', className = 'logo') {
     />`
 }
 
-function renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, trend}: IRenderContent) {
-    if (!cardName || cardName === "default") {
-        return renderOnlyLogo(images[0])
-    } else if (!valueHeader || !pairName) {
-        return renderWithoutPrice({images, cardName, md})
-    } else {
-        return renderWithPrice({images, cardName, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md, trend})
+function renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend}: IRenderContent) {
+    if (type == 'default' || !cardName) {
+        return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
+    } else if (type == 'pending' || type == 'close') {
+        return renderWithPrice({images, cardName, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
+    } else if(type == 'cumulative'){
+        return renderWithCumulative({images, cardName, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
+    }else {
+        return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     }
 }
 
 
 function renderOnlyLogo(image: string) {
     return `<div class="center">
-                ${getImage(image, "120", "tokenLogo")}
+                <img src=${image} />
             </div>`
 }
 
-function renderWithoutPrice({images, cardName, md}: IRenderWithoutPrice) {
-    return `<div class="header center">
-                <div class="details">
-                    ${getImage(images[0], '100', "tokenLogo")}
-                    <div class="name font-40px">${emojify(
+function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+    return `<div class="header">
+                    ${getImage(images[0], '30', "tokenLogo")}
+                    <div class="name">${emojify(
                         md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>
+                    )}</div>                  
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            <div class="pair-info">
+                <div class="info">
+                    <span class="pair-name">${sanitizeHtml(pairName)}</span>
+                </div>        
+                <div class="time">${sanitizeHtml(dateTime)}</div>
+            </div>
+            <div class="main">
+                <div class="title">${sanitizeHtml(valueHeader)}</div>
+                
+                <div class="details">
+                    <div class="change">
+                        ${isChangePositive?'+':''}
+                        ${isChangeNegative?'-':''}
+                        ${sanitizeHtml(trend)}
+                    </div>
+                </div>
+            </div>
+            <div class="referral">
+                <div class="code-img"><img src=${dataUrl} /></div>
+                <div class="code-num">
+                        <p>Refferral Code</p>
+                        <span>${referralCode}</span>
                 </div>
             </div>`
 }
 
-function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithPrice) {
+function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
     return `<div class="header">
                     ${getImage(images[0], '30', "tokenLogo")}
                     <div class="name">${emojify(
@@ -333,7 +360,7 @@ function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, ope
                     ${sanitizeHtml(openPrice)}
                 </div>
                 <div class="value">
-                    <p>Current Price</p>   
+                    <p>${type == 'pending'?'Current':'Close'} Price</p>   
                     ${sanitizeHtml(curPrice)}
                 </div>
             </div>

@@ -174,6 +174,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
         md = false,
         cardName = 'Openleverage',
         valueHeader = 'Pnl',
+        type = 'pending',
         pairName = 'BNB - BUSD',
         curPrice = '888 BUSD',
         openPrice = '333 BUSD',
@@ -197,6 +198,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
     theme && url.searchParams.append('theme', theme);
     mdValue && url.searchParams.append('md', mdValue);
     valueHeader && url.searchParams.append('valueHeader', valueHeader);
+    type && url.searchParams.append('type',type);
     pairName && url.searchParams.append('pairName', pairName);
     curPrice && url.searchParams.append('curPrice', curPrice);
     openPrice && url.searchParams.append('openPrice', openPrice);
@@ -286,6 +288,15 @@ const App = (_: any, state: AppState, setState: SetState) => {
                         value: valueHeader,
                         oninput: (val: string) => {
                             setLoadingState({ valueHeader: val, overrideUrl: url });
+                        }
+                    })
+                }),
+                H(Field, {
+                    label: 'Type',
+                    input: H(TextInput, {
+                        value: type,
+                        oninput: (val: string) => {
+                            setLoadingState({ type: val, overrideUrl: url });
                         }
                     })
                 }),

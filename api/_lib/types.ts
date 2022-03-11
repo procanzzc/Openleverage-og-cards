@@ -8,6 +8,7 @@ export interface ParsedRequest {
     pairName: string;
     curPrice: string;
     openPrice: string;
+    type: string;
     dateTime: string;
     referralCode: string;
     side: string;
@@ -22,6 +23,7 @@ export interface IRenderContent {
     images: string[]
     valueHeader: string
     md: boolean
+    type: string
     pairName: string
     curPrice: string
     openPrice: string
@@ -40,8 +42,23 @@ export interface IRenderWithPrice {
     curPrice: string
     openPrice: string
     dateTime: string
+    type: string
     referralCode: string
     side: string
+    valueHeader: string
+    isChangePositive: boolean
+    isChangeNegative: boolean
+    md: boolean, 
+    trend: string
+}
+
+
+export interface IRenderWithCumulative {
+    images: string[] 
+    cardName: string
+    pairName: string
+    dateTime: string
+    referralCode: string
     valueHeader: string
     isChangePositive: boolean
     isChangeNegative: boolean
