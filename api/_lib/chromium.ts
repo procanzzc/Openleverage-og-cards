@@ -13,9 +13,15 @@ async function getPage(isDev: boolean) {
     return _page;
 }
 
-export async function getScreenshot(html: string, type: FileType, isDev: boolean) {
+export async function getScreenshot(html: string, type: FileType, isDev: boolean, parsedReq: any) {
     const page = await getPage(isDev);
-    await page.setViewport({ width: 2048, height: 1170 });
+    let width = 400;
+    let height = 480;
+    if(parsedReq.type == 'default'){
+        width = 600;
+        height = 300;
+    }
+    await page.setViewport({ width, height });
     await page.setContent(html);
     const file = await page.screenshot({ type });
     return file;
