@@ -136,14 +136,14 @@ const markdownOptions: DropdownOption[] = [
 ];
 
 const imageLightOptions: DropdownOption[] = [
-    { text: 'OLE', value: 'https://openleverage.finance/brandassets/logo256x256.png' },
+    { text: 'OLE', value: 'https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FnWqpM6OIeOg3vCTddvGH%2Fcard-logo.png?alt=media&token=fdc0603b-f45a-445c-aaee-cb3b42a423bb' },
 ];
 
 const imageDarkOptions: DropdownOption[] = [
-    { text: 'OLE', value: 'https://openleverage.finance/brandassets/logo256x256.png' },
+    { text: 'OLE', value: 'https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FnWqpM6OIeOg3vCTddvGH%2Fcard-logo.png?alt=media&token=fdc0603b-f45a-445c-aaee-cb3b42a423bb' },
 ];
 
-const protocolImage = "https://openleverage.finance/brandassets/logo256x256.png"
+const protocolImage = "https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FnWqpM6OIeOg3vCTddvGH%2Fcard-logo.png?alt=media&token=fdc0603b-f45a-445c-aaee-cb3b42a423bb"
 
 
 interface AppState extends ParsedRequest {
@@ -172,7 +172,6 @@ const App = (_: any, state: AppState, setState: SetState) => {
         fileType = 'jpeg',
         theme = 'light',
         md = false,
-        cardName = 'Openleverage',
         valueHeader = 'Pnl',
         type = 'pending',
         pairName = 'BNB - BUSD',
@@ -194,7 +193,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
     const mdValue = md ? '1' : '0';
     const imageOptions = theme === 'light' ? imageLightOptions : imageDarkOptions;
     const url = new URL(window.location.origin);
-    url.pathname = `${cardName ? encodeURIComponent(cardName) : "default"}.${fileType}`;
+    url.pathname = `default.${fileType}`;
     theme && url.searchParams.append('theme', theme);
     mdValue && url.searchParams.append('md', mdValue);
     valueHeader && url.searchParams.append('valueHeader', valueHeader);
@@ -271,15 +270,6 @@ const App = (_: any, state: AppState, setState: SetState) => {
                         options: markdownOptions,
                         value: mdValue,
                         onchange: (val: string) => setLoadingState({ md: val === '1' })
-                    })
-                }),
-                H(Field, {
-                    label: 'Name',
-                    input: H(TextInput, {
-                        value: cardName,
-                        oninput: (val: string) => {
-                            setLoadingState({ cardName: val, overrideUrl: url });
-                        }
                     })
                 }),
                 H(Field, {

@@ -1,11 +1,7 @@
 
 import { readFileSync } from 'fs';
-import {marked} from 'marked';
 import { sanitizeHtml } from './sanitizer';
 import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative } from './types';
-const twemoji = require('twemoji');
-const twOptions = { folder: 'svg', ext: '.svg' };
-const emojify = (text: string) => twemoji.parse(text, twOptions);
 const QRCode = require('qrcode');
 
 const rglr = readFileSync(`${__dirname}/../_fonts/Inter-Regular.woff2`).toString('base64');
@@ -62,6 +58,14 @@ function getCss(theme: string, isChangePositive: boolean) {
         letter-spacing: -0.01em;
     }
 
+    .bg{
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: url('https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FSmcdyFo8SvwVTaIOyQyj%2Fcard-background.png?alt=media&token=ff8c9767-92d2-4943-9c65-74e2a026c21d') no-repeat right top;
+        background-size: 100% 100%;
+    }
+
     code {
         color: #D400FF;
         font-family: 'Vera';
@@ -104,7 +108,6 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .tokenLogo {
         margin-right: 12px;
-        border-radius: 50%;
     }
 
     .main {
@@ -179,7 +182,7 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .code-img{
         width: 70px;
-        height: 70px;
+        height: 50px;
         opacity: 0;
     }
 
@@ -230,7 +233,7 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export async function getHtml(parsedReq: ParsedRequest) {
-    const { cardName, valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
+    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
     console.log(footerURL,'footerURL')
 
     const isChangePositive = pnlChange?.includes("+") ?? false;
@@ -259,12 +262,13 @@ export async function getHtml(parsedReq: ParsedRequest) {
                     ${getCss(theme, isChangePositive)}
                 </style>
                 <body>
-                    ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend})}
+                    <div class="bg"></div>
+                    ${renderContent({images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend})}
                 </body>
             </html>`;
     }
 
-function getImage(src: string, height = '80', className = 'logo') {
+function getImage(src: string, height = '80', className = 'tokenLogo') {
     return `<img
         class="${sanitizeHtml(className)}"
         src="${sanitizeHtml(src)}"
@@ -274,13 +278,13 @@ function getImage(src: string, height = '80', className = 'logo') {
     />`
 }
 
-function renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend}: IRenderContent) {
-    if (type == 'default' || !cardName) {
+function renderContent({images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend}: IRenderContent) {
+    if (type == 'default') {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     } else if (type == 'pending' || type == 'close') {
-        return renderWithPrice({images, cardName, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
+        return renderWithPrice({images, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
     } else if(type == 'cumulative'){
-        return renderWithCumulative({images, cardName, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
+        return renderWithCumulative({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
     }else {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     }
@@ -293,12 +297,10 @@ function renderOnlyLogo(image: string) {
             </div>`
 }
 
-function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+function renderWithCumulative({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+    console.log(md)
     return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}
-                    <div class="name">${emojify(
-                        md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>                  
+                    ${getImage(images[0], '30', "tokenLogo")}                
             </div>
             <div class="desc">Permissionless lending and margin trading protocol</div> 
             <div class="pair-info">
@@ -327,12 +329,10 @@ function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime
             </div>`
 }
 
-function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
+function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
+    console.log(md)
     return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}
-                    <div class="name">${emojify(
-                        md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>                  
+                    ${getImage(images[0], '30', "tokenLogo")}               
             </div>
             <div class="desc">Permissionless lending and margin trading protocol</div> 
             <div class="pair-info">

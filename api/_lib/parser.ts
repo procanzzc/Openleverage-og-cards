@@ -11,23 +11,12 @@ export function parseRequest(req: IncomingMessage) {
         throw new Error('Expected a single theme');
     }
     
-    const arr = (pathname || '/').slice(1).split('.');
     let extension = '';
-    let cardName = '';
-    if (arr.length === 0) {
-        cardName = '';
-    } else if (arr.length === 1) {
-        cardName = arr[0];
-    } else {
-        extension = arr.pop() as string;
-        cardName = arr.join('.');
-    }
-
     let url = getString(footerURL);
+    console.log(pathname)
    
     const parsedRequest: ParsedRequest = {
         fileType: extension === 'jpeg' ? extension : 'png',
-        cardName: decodeURIComponent(cardName),
         valueHeader: getString(valueHeader),
         type: getString(type),
         pairName: getString(pairName),

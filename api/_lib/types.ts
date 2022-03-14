@@ -3,7 +3,6 @@ export type Theme = 'light' | 'dark';
 
 export interface ParsedRequest {
     fileType: FileType;
-    cardName: string;
     valueHeader: string;
     pairName: string;
     curPrice: string;
@@ -19,7 +18,6 @@ export interface ParsedRequest {
     images: string[];
 }
 export interface IRenderContent {
-    cardName?: string
     images: string[]
     valueHeader: string
     md: boolean
@@ -37,7 +35,6 @@ export interface IRenderContent {
 
 export interface IRenderWithPrice {
     images: string[] 
-    cardName: string
     pairName: string
     curPrice: string
     openPrice: string
@@ -55,7 +52,6 @@ export interface IRenderWithPrice {
 
 export interface IRenderWithCumulative {
     images: string[] 
-    cardName: string
     pairName: string
     dateTime: string
     referralCode: string
@@ -67,6 +63,5 @@ export interface IRenderWithCumulative {
 }
 export interface IRenderWithoutPrice {
     images: string[] 
-    cardName: string
     md: boolean
 }
