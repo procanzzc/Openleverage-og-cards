@@ -60,10 +60,12 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .bg{
         position: fixed;
-        width: 100%;
-        height: 100%;
-        background: url('https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FSmcdyFo8SvwVTaIOyQyj%2Fcard-background.png?alt=media&token=ff8c9767-92d2-4943-9c65-74e2a026c21d') no-repeat right top;
+        width: 50%;
+        height: 70%;
+        background: url('https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FSmcdyFo8SvwVTaIOyQyj%2Fcard-background.png?alt=media&token=ff8c9767-92d2-4943-9c65-74e2a026c21d') no-repeat;
         background-size: 100% 100%;
+        right: 0;
+        bottom: 0;
     }
 
     code {
