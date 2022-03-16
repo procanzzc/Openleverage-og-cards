@@ -1,7 +1,7 @@
 
 import { readFileSync } from 'fs';
 import { sanitizeHtml } from './sanitizer';
-import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative } from './types';
+import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative, IRenderWithInterest } from './types';
 const QRCode = require('qrcode');
 
 const rglr = readFileSync(`${__dirname}/../_fonts/Inter-Regular.woff2`).toString('base64');
@@ -130,6 +130,19 @@ function getCss(theme: string, isChangePositive: boolean) {
         margin-bottom: 8px;
     }
 
+    .pair-info .pool {
+       display: flex;
+       line-height: 24px;
+    }
+
+   
+
+    .reward {
+        font-size: 20px;
+        color: #FF1D7C;
+        margin-top: 10px;
+    }
+
     .pair-info .line {
         color:  rgba(255, 255, 255, 0.3);
         margin: 0 6px;
@@ -152,6 +165,15 @@ function getCss(theme: string, isChangePositive: boolean) {
         font-size: 12px;
     }
 
+    .pool .time {
+        margin-left: 10px;
+        font-size: 14px !important;
+    }
+
+    .pool .pool-name {
+        font-size: 20px !important;
+    }
+    
 
     .main .details .change {
         font-weight: 800;
@@ -235,7 +257,7 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export async function getHtml(parsedReq: ParsedRequest) {
-    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
+    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode, rewardRate } = parsedReq;
     console.log(footerURL,'footerURL')
 
     const isChangePositive = pnlChange?.includes("+") ?? false;
@@ -265,7 +287,7 @@ export async function getHtml(parsedReq: ParsedRequest) {
                 </style>
                 <body>
                     <div class="bg"></div>
-                    ${renderContent({images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend})}
+                    ${renderContent({images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend, rewardRate})}
                 </body>
             </html>`;
     }
@@ -280,13 +302,15 @@ function getImage(src: string, height = '80', className = 'tokenLogo') {
     />`
 }
 
-function renderContent({images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend}: IRenderContent) {
+function renderContent({images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend, rewardRate}: IRenderContent) {
     if (type == 'default') {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     } else if (type == 'pending' || type == 'close') {
         return renderWithPrice({images, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
     } else if(type == 'cumulative'){
         return renderWithCumulative({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
+    } else if(type == 'interest'){
+        return renderWithInterest({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend, rewardRate})
     }else {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     }
@@ -321,6 +345,42 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
+            </div>
+            <div class="referral">
+                <div class="code-img"><img src=${dataUrl} /></div>
+                <div class="code-num">
+                        <p>Refferral Code</p>
+                        <span>${referralCode}</span>
+                </div>
+            </div>`
+}
+
+function renderWithInterest({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate}:IRenderWithInterest){
+    console.log(md)
+    return `<div class="header">
+                    ${getImage(images[0], '30', "tokenLogo")}               
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            <div class="pair-info">
+                <div class="info pool">
+                    <span class="pair-name pool-name">${sanitizeHtml(pairName)}</span>
+                    <div class="time">${sanitizeHtml(dateTime)}</div>
+                </div>        
+                
+            </div>
+            <div class="main">
+                <div class="title">${sanitizeHtml(valueHeader)}</div>
+                
+                <div class="details">
+                    <div class="change">
+                        ${isChangePositive?'+':''}
+                        ${isChangeNegative?'-':''}
+                        ${sanitizeHtml(trend)}
+                    </div>
+                </div>
+            </div>
+            <div class="reward">
+                ${rewardRate}  Reward
             </div>
             <div class="referral">
                 <div class="code-img"><img src=${dataUrl} /></div>

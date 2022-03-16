@@ -16,6 +16,7 @@ export interface ParsedRequest {
     theme: Theme;
     md: boolean;
     images: string[];
+    rewardRate: string;
 }
 export interface IRenderContent {
     images: string[]
@@ -30,7 +31,8 @@ export interface IRenderContent {
     side: string
     trend: string
     isChangePositive: boolean
-    isChangeNegative: boolean
+    isChangeNegative: boolean,
+    rewardRate: string
 }
 
 export interface IRenderWithPrice {
@@ -61,6 +63,21 @@ export interface IRenderWithCumulative {
     md: boolean, 
     trend: string
 }
+
+export interface IRenderWithInterest {
+    images: string[] 
+    pairName: string
+    dateTime: string
+    referralCode: string
+    valueHeader: string
+    isChangePositive: boolean
+    isChangeNegative: boolean
+    md: boolean, 
+    trend: string,
+    rewardRate: string,
+}
+
+
 export interface IRenderWithoutPrice {
     images: string[] 
     md: boolean
