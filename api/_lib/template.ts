@@ -380,7 +380,7 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
                 </div>
             </div>
             <div class="reward">
-                ${rewardRate}  Reward
+                ${rewardRate?rewardRate + 'Reward':''}  
             </div>
             <div class="referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
