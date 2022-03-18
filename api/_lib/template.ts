@@ -260,8 +260,11 @@ export async function getHtml(parsedReq: ParsedRequest) {
     const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode, rewardRate } = parsedReq;
     console.log(footerURL,'footerURL')
 
-    const isChangePositive = pnlChange?.includes("+") ?? false;
+    let isChangePositive = pnlChange?.includes("+") ?? false;
     const isChangeNegative = pnlChange?.includes("-") ?? false;
+    if(pnlChange.indexOf("-")==-1){
+        isChangePositive = true;
+    }
 
     dataUrl = await QRCode.toDataURL('http://www.google.com',{
         margin: 1,
@@ -270,7 +273,7 @@ export async function getHtml(parsedReq: ParsedRequest) {
     let trend: string;
 
     if (isChangePositive) {
-        trend = pnlChange.split("+")[1]
+        trend = pnlChange.split("+")[1]||pnlChange
     } else if (isChangeNegative) {
         trend = pnlChange.split("-")[1]
     } else {
@@ -356,7 +359,7 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
 }
 
 function renderWithInterest({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate}:IRenderWithInterest){
-    console.log(md)
+    console.log(md,isChangePositive)
     return `<div class="header">
                     ${getImage(images[0], '30', "tokenLogo")}               
             </div>
@@ -373,7 +376,6 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+':''}
                         ${isChangeNegative?'-':''}
                         ${sanitizeHtml(trend)}
                     </div>
