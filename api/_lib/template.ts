@@ -343,8 +343,8 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+':''}
-                        ${isChangeNegative?'-':''}
+                        ${isChangePositive?'+ ':''}
+                        ${isChangeNegative?'- ':''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
@@ -382,7 +382,7 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
                 </div>
             </div>
             <div class="reward">
-                ${rewardRate?rewardRate + 'Reward':''}  
+                ${rewardRate?rewardRate + ' Reward':''}  
             </div>
             <div class="referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
@@ -412,8 +412,8 @@ function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, si
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+':''}
-                        ${isChangeNegative?'-':''}
+                        ${isChangePositive?'+ ':''}
+                        ${isChangeNegative?'- ':''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
