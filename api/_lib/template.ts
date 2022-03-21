@@ -1,11 +1,7 @@
 
 import { readFileSync } from 'fs';
-import {marked} from 'marked';
 import { sanitizeHtml } from './sanitizer';
-import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative } from './types';
-const twemoji = require('twemoji');
-const twOptions = { folder: 'svg', ext: '.svg' };
-const emojify = (text: string) => twemoji.parse(text, twOptions);
+import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative, IRenderWithInterest } from './types';
 const QRCode = require('qrcode');
 
 const rglr = readFileSync(`${__dirname}/../_fonts/Inter-Regular.woff2`).toString('base64');
@@ -62,6 +58,16 @@ function getCss(theme: string, isChangePositive: boolean) {
         letter-spacing: -0.01em;
     }
 
+    .bg{
+        position: fixed;
+        width: 50%;
+        height: 70%;
+        background: url('https://files.gitbook.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-M_8jUJwrWEVdQqoVt_f%2Fuploads%2FSmcdyFo8SvwVTaIOyQyj%2Fcard-background.png?alt=media&token=ff8c9767-92d2-4943-9c65-74e2a026c21d') no-repeat;
+        background-size: 100% 100%;
+        right: 0;
+        bottom: 0;
+    }
+
     code {
         color: #D400FF;
         font-family: 'Vera';
@@ -104,7 +110,6 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .tokenLogo {
         margin-right: 12px;
-        border-radius: 50%;
     }
 
     .main {
@@ -123,6 +128,19 @@ function getCss(theme: string, isChangePositive: boolean) {
     .pair-info .info {
         margin-top: 36px;
         margin-bottom: 8px;
+    }
+
+    .pair-info .pool {
+       display: flex;
+       line-height: 24px;
+    }
+
+   
+
+    .reward {
+        font-size: 20px;
+        color: #FF1D7C;
+        margin-top: 10px;
     }
 
     .pair-info .line {
@@ -147,6 +165,15 @@ function getCss(theme: string, isChangePositive: boolean) {
         font-size: 12px;
     }
 
+    .pool .time {
+        margin-left: 10px;
+        font-size: 14px !important;
+    }
+
+    .pool .pool-name {
+        font-size: 20px !important;
+    }
+    
 
     .main .details .change {
         font-weight: 800;
@@ -179,7 +206,7 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .code-img{
         width: 70px;
-        height: 70px;
+        height: 50px;
         opacity: 0;
     }
 
@@ -230,11 +257,14 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export async function getHtml(parsedReq: ParsedRequest) {
-    const { cardName, valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode } = parsedReq;
+    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode, rewardRate } = parsedReq;
     console.log(footerURL,'footerURL')
 
-    const isChangePositive = pnlChange?.includes("+") ?? false;
+    let isChangePositive = pnlChange?.includes("+") ?? false;
     const isChangeNegative = pnlChange?.includes("-") ?? false;
+    if(pnlChange.indexOf("-")==-1){
+        isChangePositive = true;
+    }
 
     dataUrl = await QRCode.toDataURL('http://www.google.com',{
         margin: 1,
@@ -243,7 +273,7 @@ export async function getHtml(parsedReq: ParsedRequest) {
     let trend: string;
 
     if (isChangePositive) {
-        trend = pnlChange.split("+")[1]
+        trend = pnlChange.split("+")[1]||pnlChange
     } else if (isChangeNegative) {
         trend = pnlChange.split("-")[1]
     } else {
@@ -259,12 +289,13 @@ export async function getHtml(parsedReq: ParsedRequest) {
                     ${getCss(theme, isChangePositive)}
                 </style>
                 <body>
-                    ${renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend})}
+                    <div class="bg"></div>
+                    ${renderContent({images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend, rewardRate})}
                 </body>
             </html>`;
     }
 
-function getImage(src: string, height = '80', className = 'logo') {
+function getImage(src: string, height = '80', className = 'tokenLogo') {
     return `<img
         class="${sanitizeHtml(className)}"
         src="${sanitizeHtml(src)}"
@@ -274,13 +305,15 @@ function getImage(src: string, height = '80', className = 'logo') {
     />`
 }
 
-function renderContent({cardName, images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend}: IRenderContent) {
-    if (type == 'default' || !cardName) {
+function renderContent({images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend, rewardRate}: IRenderContent) {
+    if (type == 'default') {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     } else if (type == 'pending' || type == 'close') {
-        return renderWithPrice({images, cardName, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
+        return renderWithPrice({images, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
     } else if(type == 'cumulative'){
-        return renderWithCumulative({images, cardName, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
+        return renderWithCumulative({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
+    } else if(type == 'interest'){
+        return renderWithInterest({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend, rewardRate})
     }else {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     }
@@ -293,12 +326,10 @@ function renderOnlyLogo(image: string) {
             </div>`
 }
 
-function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+function renderWithCumulative({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+    console.log(md)
     return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}
-                    <div class="name">${emojify(
-                        md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>                  
+                    ${getImage(images[0], '30', "tokenLogo")}                
             </div>
             <div class="desc">Permissionless lending and margin trading protocol</div> 
             <div class="pair-info">
@@ -312,8 +343,8 @@ function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+':''}
-                        ${isChangeNegative?'-':''}
+                        ${isChangePositive?'+ ':''}
+                        ${isChangeNegative?'- ':''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
@@ -327,12 +358,45 @@ function renderWithCumulative({images, cardName, pairName, valueHeader, dateTime
             </div>`
 }
 
-function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
+function renderWithInterest({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate}:IRenderWithInterest){
+    console.log(md,isChangePositive)
     return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}
-                    <div class="name">${emojify(
-                        md ? marked(cardName) : sanitizeHtml(cardName)
-                    )}</div>                  
+                    ${getImage(images[0], '30', "tokenLogo")}               
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            <div class="pair-info">
+                <div class="info pool">
+                    <span class="pair-name pool-name">${sanitizeHtml(pairName)}</span>
+                    <div class="time">${sanitizeHtml(dateTime)}</div>
+                </div>        
+                
+            </div>
+            <div class="main">
+                <div class="title">${sanitizeHtml(valueHeader)}</div>
+                
+                <div class="details">
+                    <div class="change">
+                        ${isChangeNegative?'-':''}
+                        ${sanitizeHtml(trend)}
+                    </div>
+                </div>
+            </div>
+            <div class="reward">
+                ${rewardRate?rewardRate + ' Reward':''}  
+            </div>
+            <div class="referral">
+                <div class="code-img"><img src=${dataUrl} /></div>
+                <div class="code-num">
+                        <p>Refferral Code</p>
+                        <span>${referralCode}</span>
+                </div>
+            </div>`
+}
+
+function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
+    console.log(md)
+    return `<div class="header">
+                    ${getImage(images[0], '30', "tokenLogo")}               
             </div>
             <div class="desc">Permissionless lending and margin trading protocol</div> 
             <div class="pair-info">
@@ -348,8 +412,8 @@ function renderWithPrice({images, cardName, pairName, valueHeader, curPrice, ope
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+':''}
-                        ${isChangeNegative?'-':''}
+                        ${isChangePositive?'+ ':''}
+                        ${isChangeNegative?'- ':''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>

@@ -5,29 +5,18 @@ import { ParsedRequest, Theme } from './types';
 export function parseRequest(req: IncomingMessage) {
     console.log('HTTP ' + req.url);
     const { pathname, query } = parse(req.url || '/', true);
-    const { footerURL, images, theme, md, valueHeader,type, pairName, pnlChange, curPrice, openPrice,side, dateTime, referralCode } = (query || {});
+    const { footerURL, images, theme, md, valueHeader,type, pairName, pnlChange, curPrice, openPrice,side, dateTime, referralCode,rewardRate } = (query || {});
 
     if (Array.isArray(theme)) {
         throw new Error('Expected a single theme');
     }
     
-    const arr = (pathname || '/').slice(1).split('.');
     let extension = '';
-    let cardName = '';
-    if (arr.length === 0) {
-        cardName = '';
-    } else if (arr.length === 1) {
-        cardName = arr[0];
-    } else {
-        extension = arr.pop() as string;
-        cardName = arr.join('.');
-    }
-
     let url = getString(footerURL);
+    console.log(pathname)
    
     const parsedRequest: ParsedRequest = {
         fileType: extension === 'jpeg' ? extension : 'png',
-        cardName: decodeURIComponent(cardName),
         valueHeader: getString(valueHeader),
         type: getString(type),
         pairName: getString(pairName),
@@ -41,6 +30,7 @@ export function parseRequest(req: IncomingMessage) {
         theme: theme === 'dark' ? 'dark' : 'light',
         md: md === '1' || md === 'true',
         images: getArray(images),
+        rewardRate: getString(rewardRate)
     };
     parsedRequest.images = getDefaultImages(parsedRequest.images, parsedRequest.theme);
     return parsedRequest;
