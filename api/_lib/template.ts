@@ -127,12 +127,13 @@ function getCss(theme: string, isChangePositive: boolean) {
     }
 
     .pair-info .info {
-        margin-top: 26px;
+        margin-top: 10px;
         margin-bottom: 8px;
     }
 
     .pair-info .pool {
        display: flex;
+       margin-top: 16px;
        line-height: 24px;
     }
 
@@ -172,7 +173,7 @@ function getCss(theme: string, isChangePositive: boolean) {
     }
 
     .pool .pool-name {
-        font-size: 20px !important;
+        font-size: 32px !important;
     }
     
 
@@ -246,6 +247,10 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .font-40px {
         font-size: 40px !important;
+    }
+
+    .pool-referral{
+        margin-top: 20px;
     }
     
 
@@ -384,7 +389,7 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
             <div class="reward">
                 ${rewardRate?rewardRate + ' Reward':''}  
             </div>
-            <div class="referral">
+            <div class="referral pool-referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
                 <div class="code-num">
                         <p>Refferral Code</p>
