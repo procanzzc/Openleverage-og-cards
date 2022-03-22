@@ -82,6 +82,7 @@ function getCss(theme: string, isChangePositive: boolean) {
     .header {
         display: flex;
         align-items: center;
+        margin-top: 20px;
     }
 
     .header .details {
@@ -104,7 +105,7 @@ function getCss(theme: string, isChangePositive: boolean) {
     .desc {
         font-size: 12px;
         font-weight: normal;
-        margin-top: 10px;
+        margin-top: 5px;
         color: rgba(255, 255, 255, 0.5);
     }
 
@@ -126,7 +127,7 @@ function getCss(theme: string, isChangePositive: boolean) {
     }
 
     .pair-info .info {
-        margin-top: 36px;
+        margin-top: 26px;
         margin-bottom: 8px;
     }
 
@@ -151,12 +152,12 @@ function getCss(theme: string, isChangePositive: boolean) {
 
     .info .pair-name {
         font-weight: bold;
-        font-size: 16px;
+        font-size: 20px;
         color: rgba(255, 255, 255, 0.8);
     }
 
     .info .pair-side {
-        font-size: 16px;
+        font-size: 20px;
         font-weight: 500;
     }
 
@@ -328,10 +329,7 @@ function renderOnlyLogo(image: string) {
 
 function renderWithCumulative({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
     console.log(md)
-    return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}                
-            </div>
-            <div class="desc">Permissionless lending and margin trading protocol</div> 
+    return `
             <div class="pair-info">
                 <div class="info">
                     <span class="pair-name">${sanitizeHtml(pairName)}</span>
@@ -355,15 +353,17 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
                         <p>Refferral Code</p>
                         <span>${referralCode}</span>
                 </div>
-            </div>`
+            </div>
+            <div class="header">
+                    ${getImage(images[0], '18', "tokenLogo")}                
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            `
 }
 
 function renderWithInterest({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate}:IRenderWithInterest){
     console.log(md,isChangePositive)
-    return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}               
-            </div>
-            <div class="desc">Permissionless lending and margin trading protocol</div> 
+    return `
             <div class="pair-info">
                 <div class="info pool">
                     <span class="pair-name pool-name">${sanitizeHtml(pairName)}</span>
@@ -390,15 +390,17 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
                         <p>Refferral Code</p>
                         <span>${referralCode}</span>
                 </div>
-            </div>`
+            </div>
+            <div class="header">
+                    ${getImage(images[0], '18', "tokenLogo")}               
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+        `
 }
 
 function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
     console.log(md)
-    return `<div class="header">
-                    ${getImage(images[0], '30', "tokenLogo")}               
-            </div>
-            <div class="desc">Permissionless lending and margin trading protocol</div> 
+    return `
             <div class="pair-info">
                 <div class="info">
                     <span class="pair-name">${sanitizeHtml(pairName)}</span>
@@ -434,5 +436,10 @@ function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, si
                         <p>Refferral Code</p>
                         <span>${referralCode}</span>
                 </div>
-            </div>`
+            </div>
+            <div class="header">
+                    ${getImage(images[0], '18', "tokenLogo")}               
+            </div>
+            <div class="desc">Permissionless lending and margin trading protocol</div> 
+            `
 }
