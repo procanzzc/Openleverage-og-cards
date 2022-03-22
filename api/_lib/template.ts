@@ -355,7 +355,7 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
             <div class="referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
                 <div class="code-num">
-                        <p>Refferral Code</p>
+                        <p>Referral Code</p>
                         <span>${referralCode}</span>
                 </div>
             </div>
@@ -392,7 +392,7 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
             <div class="referral pool-referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
                 <div class="code-num">
-                        <p>Refferral Code</p>
+                        <p>Referral Code</p>
                         <span>${referralCode}</span>
                 </div>
             </div>
@@ -438,7 +438,7 @@ function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, si
             <div class="referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
                 <div class="code-num">
-                        <p>Refferral Code</p>
+                        <p>Referral Code</p>
                         <span>${referralCode}</span>
                 </div>
             </div>
