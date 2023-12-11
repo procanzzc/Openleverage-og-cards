@@ -169,7 +169,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
         setState({ ...newState, loading: true });
     };
     const {
-        fileType = 'png',
+        fileType = 'jpeg',
         theme = 'light',
         md = false,
         valueHeader = 'Pnl',
