@@ -1,6 +1,6 @@
 
 import { readFileSync } from 'fs';
-import { sanitizeHtml, reverseSanitizeHtml } from './sanitizer';
+import { sanitizeHtml } from './sanitizer';
 import { ParsedRequest, IRenderContent, IRenderWithPrice, IRenderWithCumulative, IRenderWithInterest } from './types';
 const QRCode = require('qrcode');
 
