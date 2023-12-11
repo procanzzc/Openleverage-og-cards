@@ -285,9 +285,9 @@ export async function getHtml(parsedReq: ParsedRequest) {
     } else {
         trend = pnlChange || '';
     }
-    if (trend) {
-        trend = reverseSanitizeHtml(trend)
-    }
+    // if (trend) {
+    //     trend = reverseSanitizeHtml(trend)
+    // }
 
     return `<!DOCTYPE html>
             <html>
