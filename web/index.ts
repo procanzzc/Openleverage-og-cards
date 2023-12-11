@@ -91,8 +91,8 @@ interface FieldProps {
 const Field = ({ label, input }: FieldProps) => {
     return H('div',
         { className: 'field' },
-        H('label', 
-            H('div', {className: 'field-label'}, label),
+        H('label',
+            H('div', { className: 'field-label' }, label),
             H('div', { className: 'field-value' }, input),
         ),
     );
@@ -104,7 +104,7 @@ interface ToastProps {
 }
 
 const Toast = ({ show, message }: ToastProps) => {
-    const style = { transform:  show ? 'translate3d(0,-0px,-0px) scale(1)' : '' };
+    const style = { transform: show ? 'translate3d(0,-0px,-0px) scale(1)' : '' };
     return H('div',
         { className: 'toast-area' },
         H('div',
@@ -112,7 +112,7 @@ const Toast = ({ show, message }: ToastProps) => {
             H('div',
                 { className: 'toast-inner' },
                 H('div',
-                    { className: 'toast-message'},
+                    { className: 'toast-message' },
                     message
                 )
             )
@@ -169,7 +169,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
         setState({ ...newState, loading: true });
     };
     const {
-        fileType = 'jpeg',
+        fileType = 'png',
         theme = 'light',
         md = false,
         valueHeader = 'Pnl',
@@ -182,14 +182,14 @@ const App = (_: any, state: AppState, setState: SetState) => {
         dateTime = 'Mar 15, 22 20:00',
         referralCode = 'Um13231',
         footerURL = "https://openleverage.finance",
-        images=[protocolImage],
+        images = [protocolImage],
         showToast = false,
         messageToast = '',
         loading = true,
         selectedImageIndex = 0,
         overrideUrl = null,
     } = state;
-    
+
     const mdValue = md ? '1' : '0';
     const imageOptions = theme === 'light' ? imageLightOptions : imageDarkOptions;
     const url = new URL(window.location.origin);
@@ -197,7 +197,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
     theme && url.searchParams.append('theme', theme);
     mdValue && url.searchParams.append('md', mdValue);
     valueHeader && url.searchParams.append('valueHeader', valueHeader);
-    type && url.searchParams.append('type',type);
+    type && url.searchParams.append('type', type);
     pairName && url.searchParams.append('pairName', pairName);
     curPrice && url.searchParams.append('curPrice', curPrice);
     openPrice && url.searchParams.append('openPrice', openPrice);
@@ -210,9 +210,9 @@ const App = (_: any, state: AppState, setState: SetState) => {
     for (let image of images) {
         url.searchParams.append('images', image);
     }
-  
 
-    const showAddImageBtn = images.length === 1 ? ( H(Field, {
+
+    const showAddImageBtn = images.length === 1 ? (H(Field, {
         label: `Image`,
         input: H(Button, {
             label: `Add Image`,
@@ -255,7 +255,7 @@ const App = (_: any, state: AppState, setState: SetState) => {
                         H(Dropdown, {
                             options: imageOptions,
                             value: imageOptions[selectedImageIndex].value,
-                            onchange: (val: string) =>  {
+                            onchange: (val: string) => {
                                 let clone = [...images];
                                 clone[0] = val;
                                 const selected = imageOptions.map(o => o.value).indexOf(val);

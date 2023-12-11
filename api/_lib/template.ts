@@ -1,6 +1,6 @@
 
 import { readFileSync } from 'fs';
-import { sanitizeHtml } from './sanitizer';
+import { sanitizeHtml, reverseSanitizeHtml } from './sanitizer';
 import { ParsedRequest, IRenderContent, IRenderWithPrice, IRenderWithCumulative, IRenderWithInterest } from './types';
 const QRCode = require('qrcode');
 
@@ -285,9 +285,9 @@ export async function getHtml(parsedReq: ParsedRequest) {
     } else {
         trend = pnlChange || '';
     }
-    // if (trend) {
-    //     trend = reverseSanitizeHtml(trend)
-    // }
+    if (trend) {
+        trend = reverseSanitizeHtml(trend)
+    }
 
     return `<!DOCTYPE html>
             <html>
