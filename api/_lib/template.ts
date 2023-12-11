@@ -1,7 +1,7 @@
 
 import { readFileSync } from 'fs';
-import { sanitizeHtml } from './sanitizer';
-import { ParsedRequest, IRenderContent, IRenderWithPrice,IRenderWithCumulative, IRenderWithInterest } from './types';
+import { sanitizeHtml, reverseSanitizeHtml } from './sanitizer';
+import { ParsedRequest, IRenderContent, IRenderWithPrice, IRenderWithCumulative, IRenderWithInterest } from './types';
 const QRCode = require('qrcode');
 
 const rglr = readFileSync(`${__dirname}/../_fonts/Inter-Regular.woff2`).toString('base64');
@@ -263,27 +263,30 @@ function getCss(theme: string, isChangePositive: boolean) {
 }
 
 export async function getHtml(parsedReq: ParsedRequest) {
-    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side,dateTime, referralCode, rewardRate } = parsedReq;
-    console.log(footerURL,'footerURL')
+    const { valueHeader, type, pairName, pnlChange, footerURL, theme, md, images, curPrice, openPrice, side, dateTime, referralCode, rewardRate } = parsedReq;
+    console.log(footerURL, 'footerURL')
 
     let isChangePositive = pnlChange?.includes("+") ?? false;
     const isChangeNegative = pnlChange?.includes("-") ?? false;
-    if(pnlChange.indexOf("-")==-1){
+    if (pnlChange.indexOf("-") == -1) {
         isChangePositive = true;
     }
 
-    dataUrl = await QRCode.toDataURL('http://www.google.com',{
+    dataUrl = await QRCode.toDataURL('http://www.google.com', {
         margin: 1,
         width: 70
     });
     let trend: string;
 
     if (isChangePositive) {
-        trend = pnlChange.split("+")[1]||pnlChange
+        trend = pnlChange.split("+")[1] || pnlChange
     } else if (isChangeNegative) {
         trend = pnlChange.split("-")[1]
     } else {
         trend = pnlChange || '';
+    }
+    if (trend) {
+        trend = reverseSanitizeHtml(trend)
     }
 
     return `<!DOCTYPE html>
@@ -296,10 +299,10 @@ export async function getHtml(parsedReq: ParsedRequest) {
                 </style>
                 <body>
                     <div class="bg"></div>
-                    ${renderContent({images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode,isChangePositive, isChangeNegative, type, trend, rewardRate})}
+                    ${renderContent({ images, valueHeader, md, pairName, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, type, trend, rewardRate })}
                 </body>
             </html>`;
-    }
+}
 
 function getImage(src: string, height = '80', className = 'tokenLogo') {
     return `<img
@@ -311,16 +314,16 @@ function getImage(src: string, height = '80', className = 'tokenLogo') {
     />`
 }
 
-function renderContent({images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend, rewardRate}: IRenderContent) {
+function renderContent({ images, valueHeader, md, pairName, curPrice, openPrice, dateTime, referralCode, side, isChangePositive, isChangeNegative, type, trend, rewardRate }: IRenderContent) {
     if (type == 'default') {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     } else if (type == 'pending' || type == 'close') {
-        return renderWithPrice({images, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md,type, trend})
-    } else if(type == 'cumulative'){
-        return renderWithCumulative({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend})
-    } else if(type == 'interest'){
-        return renderWithInterest({images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend, rewardRate})
-    }else {
+        return renderWithPrice({ images, pairName, curPrice, openPrice, dateTime, referralCode, side, valueHeader, isChangePositive, isChangeNegative, md, type, trend })
+    } else if (type == 'cumulative') {
+        return renderWithCumulative({ images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend })
+    } else if (type == 'interest') {
+        return renderWithInterest({ images, pairName, dateTime, referralCode, valueHeader, isChangePositive, isChangeNegative, md, trend, rewardRate })
+    } else {
         return renderOnlyLogo('https://openleverage.finance/token-icons/desc.png')
     }
 }
@@ -332,7 +335,7 @@ function renderOnlyLogo(image: string) {
             </div>`
 }
 
-function renderWithCumulative({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend}: IRenderWithCumulative){
+function renderWithCumulative({ images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend }: IRenderWithCumulative) {
     console.log(md)
     return `
             <div class="pair-info">
@@ -346,8 +349,8 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+ ':''}
-                        ${isChangeNegative?'- ':''}
+                        ${isChangePositive ? '+ ' : ''}
+                        ${isChangeNegative ? '- ' : ''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
@@ -366,8 +369,8 @@ function renderWithCumulative({images, pairName, valueHeader, dateTime, referral
             `
 }
 
-function renderWithInterest({images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate}:IRenderWithInterest){
-    console.log(md,isChangePositive)
+function renderWithInterest({ images, pairName, valueHeader, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, rewardRate }: IRenderWithInterest) {
+    console.log(md, isChangePositive)
     return `
             <div class="pair-info">
                 <div class="info pool">
@@ -381,13 +384,13 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangeNegative?'-':''}
+                        ${isChangeNegative ? '-' : ''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
             </div>
             <div class="reward">
-                ${rewardRate?rewardRate + ' Reward':''}  
+                ${rewardRate ? rewardRate + ' Reward' : ''}  
             </div>
             <div class="referral pool-referral">
                 <div class="code-img"><img src=${dataUrl} /></div>
@@ -403,14 +406,14 @@ function renderWithInterest({images, pairName, valueHeader, dateTime, referralCo
         `
 }
 
-function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type}: IRenderWithPrice) {
+function renderWithPrice({ images, pairName, valueHeader, curPrice, openPrice, side, dateTime, referralCode, isChangePositive, isChangeNegative, md, trend, type }: IRenderWithPrice) {
     console.log(md)
     return `
             <div class="pair-info">
                 <div class="info">
                     <span class="pair-name">${sanitizeHtml(pairName)}</span>
                     <span class="line">|</span>
-                    <span class="pair-side" style="${side.indexOf('Long')!==-1?'color:#21E070':'color:#FF1D7C'}">${sanitizeHtml(side)}</span>
+                    <span class="pair-side" style="${side.indexOf('Long') !== -1 ? 'color:#21E070' : 'color:#FF1D7C'}">${sanitizeHtml(side)}</span>
                 </div>        
                 <div class="time">${sanitizeHtml(dateTime)}</div>
             </div>
@@ -419,8 +422,8 @@ function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, si
                 
                 <div class="details">
                     <div class="change">
-                        ${isChangePositive?'+ ':''}
-                        ${isChangeNegative?'- ':''}
+                        ${isChangePositive ? '+ ' : ''}
+                        ${isChangeNegative ? '- ' : ''}
                         ${sanitizeHtml(trend)}
                     </div>
                 </div>
@@ -431,7 +434,7 @@ function renderWithPrice({images, pairName, valueHeader, curPrice, openPrice, si
                     ${sanitizeHtml(openPrice)}
                 </div>
                 <div class="value">
-                    <p>${type == 'pending'?'Current':'Close'} Price</p>   
+                    <p>${type == 'pending' ? 'Current' : 'Close'} Price</p>   
                     ${sanitizeHtml(curPrice)}
                 </div>
             </div>
