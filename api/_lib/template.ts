@@ -288,6 +288,7 @@ export async function getHtml(parsedReq: ParsedRequest) {
     if (trend) {
         trend = reverseSanitizeHtml(trend)
     }
+    console.log("trend == ", trend)
 
     return `<!DOCTYPE html>
             <html>
