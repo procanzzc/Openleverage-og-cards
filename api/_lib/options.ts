@@ -1,4 +1,4 @@
-import chrome from 'chrome-aws-lambda';
+const chrome = require("@sparticuz/chromium");
 const exePath = process.platform === 'win32'
     ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
     : process.platform === 'linux'
