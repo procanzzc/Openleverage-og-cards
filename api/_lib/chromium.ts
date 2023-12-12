@@ -1,7 +1,7 @@
 import core from 'puppeteer-core';
 import { getOptions } from './options';
 import { FileType } from './types';
-let _page: core.Page | null;
+let _page: any;
 
 async function getPage(isDev: boolean) {
     if (_page) {
@@ -17,7 +17,7 @@ export async function getScreenshot(html: string, type: FileType, isDev: boolean
     const page = await getPage(isDev);
     let width = 400;
     let height = 480;
-    if(parsedReq.type == 'default'){
+    if (parsedReq.type == 'default') {
         width = 600;
         height = 300;
     }
